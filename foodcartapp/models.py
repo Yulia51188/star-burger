@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 from django.core.validators import MinValueValidator
 from phonenumber_field.modelfields import PhoneNumberField
@@ -169,6 +171,11 @@ class Order(models.Model):
     last_name = models.CharField('Фамилия', max_length=100)
     address = models.CharField('Адрес', max_length=200)
     phone = PhoneNumberField('Номер телефона')
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Время создания заказа',
+        db_index=True
+    )
 
     total_cost = models.DecimalField(
         'Стоимость заказа',

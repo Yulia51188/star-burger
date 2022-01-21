@@ -108,9 +108,16 @@ class ProductAdmin(admin.ModelAdmin):
     pass
 
 
+class OrderItemInline(admin.TabularInline):
+    model = OrderItem
+
+
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('id', 'first_name', 'last_name', 'total_cost', 'created_at')
+    inlines = [
+        OrderItemInline,
+    ]
 
 
 @admin.register(OrderItem)
