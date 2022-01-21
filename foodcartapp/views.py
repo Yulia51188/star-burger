@@ -1,8 +1,15 @@
+import json
+
 from django.http import JsonResponse
 from django.templatetags.static import static
+from django.db import transaction
+from django.shortcuts import get_object_or_404
+from phonenumber_field.phonenumber import PhoneNumber
 
 
 from .models import Product
+from .models import Order
+from .models import OrderItem
 
 
 def banners_list_api(request):
@@ -57,6 +64,38 @@ def product_list_api(request):
     })
 
 
+@transaction.atomic
 def register_order(request):
-    # TODO это лишь заглушка
-    return JsonResponse({})
+    try:
+        order_details = json.loads(request.body.decode())
+        print(order_details)
+        order = Order.objects.create(
+            first_name=order_details['firstname'],
+            last_name=order_details['lastname'],
+            address=order_details['address'],
+            phone=PhoneNumber.from_string(
+                phone_number=order_details['phonenumber'],
+                region='RU'
+            ).as_e164,
+        )
+
+        for product in order_details['products']:
+            product_entry = get_object_or_404(Product, id=product['product'])
+            OrderItem.objects.create(
+                order=order,
+                product=product_entry,
+                quantity=product['quantity'],
+                price=product_entry.price,
+            )
+
+        order.total_cost = order.items.calc_total_cost()
+        order.save()
+
+        return JsonResponse(order_details, safe=False, json_dumps_params={
+            'ensure_ascii': False,
+            'indent': 4,
+        })
+    except ValueError:
+        return JsonResponse({
+            'error': 'bla bla bla',
+        })
