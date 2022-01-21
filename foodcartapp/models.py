@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator
+from phonenumber_field.modelfields import PhoneNumberField
 
 
 class Restaurant(models.Model):
@@ -121,3 +122,65 @@ class RestaurantMenuItem(models.Model):
 
     def __str__(self):
         return f"{self.restaurant.name} - {self.product.name}"
+
+
+class OrderItemQuerySet(models.QuerySet):
+    def calc_total_cost(self):
+        total_cost = 0
+        for item in self.all():
+            total_cost += item.price * item.quantity
+        return total_cost
+
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(
+        'Order',
+        verbose_name='Заказ',
+        related_name='items',
+        on_delete=models.CASCADE,
+        db_index=True,
+    )
+    product = models.ForeignKey(
+        'Product',
+        verbose_name='Товар',
+        on_delete=models.CASCADE,
+        related_name='order_items'
+    )
+    quantity = models.PositiveIntegerField('Количество')
+    price = models.DecimalField(
+        'цена',
+        max_digits=8,
+        decimal_places=2,
+        validators=[MinValueValidator(0)]
+    )
+
+    objects = OrderItemQuerySet.as_manager()
+
+    class Meta:
+        verbose_name = 'товар в заказе'
+        verbose_name_plural = 'товары в заказах'
+
+    def __str__(self):
+        return f'{self.product.name} х {self.quantity} в заказе {self.order.id}'
+
+
+class Order(models.Model):
+    first_name = models.CharField('Имя', max_length=100)
+    last_name = models.CharField('Фамилия', max_length=100)
+    address = models.CharField('Адрес', max_length=200)
+    phone = PhoneNumberField('Номер телефона')
+
+    total_cost = models.DecimalField(
+        'Стоимость заказа',
+        max_digits=8,
+        decimal_places=2,
+        validators=[MinValueValidator(0)],
+        null=True,
+    )
+
+    class Meta:
+        verbose_name = 'заказ'
+        verbose_name_plural = 'заказы'
+
+    def __str__(self):
+        return f'Заказ №{self.id}'
