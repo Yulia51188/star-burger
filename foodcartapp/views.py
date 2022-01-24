@@ -139,7 +139,6 @@ def validate_post_data(order_details):
         }
 
     phonenumber = order_details.get('phonenumber')
-    print('PHONE NUMBER', phonenumber)
     if not phonenumber:
         return False, {
             "type": "ValueError",
