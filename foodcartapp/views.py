@@ -62,10 +62,16 @@ def product_list_api(request):
     })
 
 
-@api_view(['POST'])
 @transaction.atomic
+@api_view(['POST'])
 def register_order(request):
     order_details = request.data
+
+    is_valid_products, error_details = validate_products(
+        order_details.get('products'))
+    if not is_valid_products:
+        return Response(error_details, status=status.HTTP_400_BAD_REQUEST)
+
     order = Order.objects.create(
         first_name=order_details['firstname'],
         last_name=order_details['lastname'],
@@ -73,11 +79,6 @@ def register_order(request):
         phone=PhoneNumber.from_string(
             phone_number=order_details['phonenumber'], region='RU').as_e164,
     )
-    is_valid_products, error_details = validate_products(
-        order_details.get('products'))
-
-    if not is_valid_products:
-        return Response(error_details, status=status.HTTP_400_BAD_REQUEST)
 
     for product in order_details['products']:
         product_entry = get_object_or_404(Product, id=product['product'])
