@@ -1,17 +1,13 @@
-import json
-
-from django.http import JsonResponse
-from django.templatetags.static import static
 from django.db import transaction
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+from django.templatetags.static import static
 from phonenumber_field.phonenumber import PhoneNumber
+from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-
-from .models import Product
-from .models import Order
-from .models import OrderItem
+from .models import Order, OrderItem, Product
 
 
 def banners_list_api(request):
@@ -77,6 +73,11 @@ def register_order(request):
         phone=PhoneNumber.from_string(
             phone_number=order_details['phonenumber'], region='RU').as_e164,
     )
+    is_valid_products, error_details = validate_products(
+        order_details.get('products'))
+
+    if not is_valid_products:
+        return Response(error_details, status=status.HTTP_400_BAD_REQUEST)
 
     for product in order_details['products']:
         product_entry = get_object_or_404(Product, id=product['product'])
@@ -91,3 +92,25 @@ def register_order(request):
     order.save()
 
     return Response(order_details)
+
+
+def validate_products(products):
+    if products is None:
+        return False, {
+            "type": "ValueError",
+            "data_filed": "products",
+            "message": "products field value is null or skipped",
+        }
+    if not isinstance(products, list):
+        return False, {
+            "type": "ValueError",
+            "data_filed": "products",
+            "message": "products field value is not a list",
+        }
+    if not any(products):
+        return False, {
+            "type": "ValueError",
+            "data_filed": "products",
+            "message": "products list is empty",
+        }
+    return True, None
