@@ -103,18 +103,13 @@ class ProductAdmin(admin.ModelAdmin):
     get_image_list_preview.short_description = 'превью'
 
 
-@admin.register(ProductCategory)
-class ProductAdmin(admin.ModelAdmin):
-    pass
-
-
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
 
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('id', 'first_name', 'last_name', 'total_cost', 'created_at')
+    list_display = ('id', 'firstname', 'lastname', 'total_cost', 'created_at')
     inlines = [
         OrderItemInline,
     ]

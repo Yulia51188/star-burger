@@ -167,10 +167,10 @@ class OrderItem(models.Model):
 
 
 class Order(models.Model):
-    first_name = models.CharField('Имя', max_length=100)
-    last_name = models.CharField('Фамилия', max_length=100)
+    firstname = models.CharField('Имя', max_length=100)
+    lastname = models.CharField('Фамилия', max_length=100)
     address = models.CharField('Адрес', max_length=200)
-    phone = PhoneNumberField('Номер телефона')
+    phonenumber = PhoneNumberField('Номер телефона')
     created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Время создания заказа',
