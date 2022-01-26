@@ -183,14 +183,6 @@ class Order(models.Model):
         db_index=True
     )
 
-    total_cost = models.DecimalField(
-        'Стоимость заказа',
-        max_digits=8,
-        decimal_places=2,
-        validators=[MinValueValidator(0)],
-        null=True,
-    )
-
     status = models.CharField(
         'Статус заказа',
         max_length=14,

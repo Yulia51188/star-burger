@@ -100,8 +100,5 @@ def register_order(request):
     ]
     OrderItem.objects.bulk_create(order_items)
 
-    order.total_cost = order.products.calc_total_cost()
-    order.save()
-
     order_serializer = OrderSerializer(order)
     return Response(order_serializer.data)
