@@ -185,6 +185,13 @@ class Order(models.Model):
         null=True,
     )
 
+    status = models.CharField(
+        'Статус заказа',
+        max_length=14,
+        choices=OrderStatus.choices,
+        default=OrderStatus.NOT_PROCESSED,
+    )
+
     class Meta:
         verbose_name = 'заказ'
         verbose_name_plural = 'заказы'
