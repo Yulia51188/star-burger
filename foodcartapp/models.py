@@ -167,6 +167,12 @@ class OrderItem(models.Model):
 
 
 class Order(models.Model):
+
+    class OrderStatus(models.TextChoices):
+        NOT_PROCESSED = 'not_processed', 'Не обработан'
+        PROCESSED = 'processed', 'Обработан'
+        DONE = 'done', 'Завершен'
+
     firstname = models.CharField('Имя', max_length=100)
     lastname = models.CharField('Фамилия', max_length=100)
     address = models.CharField('Адрес', max_length=200)
