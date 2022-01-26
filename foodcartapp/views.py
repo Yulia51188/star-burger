@@ -1,14 +1,10 @@
 from django.db import transaction
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
 from django.templatetags.static import static
-from phonenumber_field.phonenumber import PhoneNumber
-import phonenumbers
-from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
-from rest_framework.serializers import ValidationError
+from rest_framework.renderers import JSONRenderer
 
 from .models import Order, OrderItem, Product
 
@@ -24,7 +20,7 @@ class OrderSerializer(ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ['firstname', 'lastname', 'phonenumber', 'address', 'products']
+        fields = ['id', 'firstname', 'lastname', 'phonenumber', 'address', 'products']
 
 
 def banners_list_api(request):
@@ -104,7 +100,8 @@ def register_order(request):
     ]
     OrderItem.objects.bulk_create(order_items)
 
-    order.total_cost = order.items.calc_total_cost()
+    order.total_cost = order.products.calc_total_cost()
     order.save()
 
-    return Response(request.data)
+    order_serializer = OrderSerializer(order)
+    return Response(order_serializer.data)
