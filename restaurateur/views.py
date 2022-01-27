@@ -8,8 +8,9 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
 
 
-from foodcartapp.models import Product, Restaurant, Order
-from foodcartapp.views import OrderSerializer
+from foodcartapp.models import Product, Restaurant, Order, OrderItem
+from rest_framework.serializers import ModelSerializer
+from rest_framework import serializers
 
 
 class Login(forms.Form):
@@ -96,10 +97,40 @@ def view_restaurants(request):
     })
 
 
+class OrderItemsSerializer(ModelSerializer):
+    class Meta:
+        model = OrderItem
+        fields = ['id', 'product', 'quantity', 'price']
+
+
+class OrderSerializer(ModelSerializer):
+    products = OrderItemsSerializer(many=True, allow_empty=False)
+    total_cost = serializers.DecimalField(max_digits=8, decimal_places=2)
+
+    class Meta:
+        model = Order
+        fields = [
+            'id',
+            'firstname',
+            'lastname',
+            'phonenumber',
+            'address',
+            'products',
+            'total_cost',
+        ]
+        read_only_fields = ('id', 'total_cost')
+
+
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
-    orders = Order.objects.filter(status=Order.OrderStatus.NOT_PROCESSED)
-    order_serializers = OrderSerializer(orders, many=True)
+    orders = (
+        Order.objects
+        .filter(status=Order.OrderStatus.NOT_PROCESSED)
+        .prefetch_related('products')
+        .calculate_total_cost()
+    )
+
+    orders_serializer = OrderSerializer(orders, many=True)
     return render(request, template_name='order_items.html', context={
-        'orders': order_serializers.data
+        'orders': orders_serializer.data
     })

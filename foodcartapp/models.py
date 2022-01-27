@@ -1,8 +1,7 @@
-import datetime
-
 from django.db import models
 from django.core.validators import MinValueValidator
 from phonenumber_field.modelfields import PhoneNumberField
+from django.db.models import F, Sum
 
 
 class Restaurant(models.Model):
@@ -126,14 +125,6 @@ class RestaurantMenuItem(models.Model):
         return f"{self.restaurant.name} - {self.product.name}"
 
 
-class OrderItemQuerySet(models.QuerySet):
-    def calc_total_cost(self):
-        total_cost = 0
-        for item in self.all():
-            total_cost += item.price * item.quantity
-        return total_cost
-
-
 class OrderItem(models.Model):
     order = models.ForeignKey(
         'Order',
@@ -156,14 +147,18 @@ class OrderItem(models.Model):
         validators=[MinValueValidator(0)]
     )
 
-    objects = OrderItemQuerySet.as_manager()
-
     class Meta:
         verbose_name = 'товар в заказе'
         verbose_name_plural = 'товары в заказах'
 
     def __str__(self):
         return f'{self.product.name} х {self.quantity} в заказе {self.order.id}'
+
+
+class OrderQuerySet(models.QuerySet):
+    def calculate_total_cost(self):
+        return self.annotate(
+            total_cost=Sum(F('products__price') * F('products__quantity')))
 
 
 class Order(models.Model):
@@ -189,6 +184,8 @@ class Order(models.Model):
         choices=OrderStatus.choices,
         default=OrderStatus.NOT_PROCESSED,
     )
+
+    objects = OrderQuerySet.as_manager()
 
     class Meta:
         verbose_name = 'заказ'

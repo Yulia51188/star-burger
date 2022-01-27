@@ -21,6 +21,7 @@ class OrderSerializer(ModelSerializer):
     class Meta:
         model = Order
         fields = ['id', 'firstname', 'lastname', 'phonenumber', 'address', 'products']
+        read_only_fields = ('id',)
 
 
 def banners_list_api(request):
