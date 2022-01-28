@@ -109,12 +109,19 @@ class OrderItemInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('id', 'firstname', 'lastname', 'created_at',
+    list_display = ('id', 'order_cost', 'firstname', 'lastname', 'created_at',
                     'status')
     list_filter = ('status',)
     inlines = [
         OrderItemInline,
     ]
+
+    def order_cost(self, obj):
+        return f"{obj.total_cost} руб."
+
+    def get_queryset(self, request):
+        orders = super().get_queryset(request)
+        return orders.calculate_total_cost()
 
     def save_formset(self, request, form, formset, change):
         order_items = formset.save(commit=False)
