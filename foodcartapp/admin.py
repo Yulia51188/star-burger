@@ -1,10 +1,10 @@
+
 from django.contrib import admin
 from django.shortcuts import reverse
 from django.templatetags.static import static
 from django.utils.html import format_html
 
 from .models import Product
-from .models import ProductCategory
 from .models import Restaurant
 from .models import RestaurantMenuItem
 from .models import Order
@@ -115,6 +115,16 @@ class OrderAdmin(admin.ModelAdmin):
     inlines = [
         OrderItemInline,
     ]
+
+    def save_formset(self, request, form, formset, change):
+        order_items = formset.save(commit=False)
+        for obj in formset.deleted_objects:
+            obj.delete()
+        for order_item in order_items:
+            if not order_item.price:
+                product = Product.objects.get(id=order_item.product.id)
+                order_item.price = product.price
+            order_item.save()
 
 
 @admin.register(OrderItem)

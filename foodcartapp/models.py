@@ -144,7 +144,8 @@ class OrderItem(models.Model):
         'цена',
         max_digits=8,
         decimal_places=2,
-        validators=[MinValueValidator(0)]
+        validators=[MinValueValidator(0)],
+        blank=True,
     )
 
     class Meta:
@@ -152,7 +153,7 @@ class OrderItem(models.Model):
         verbose_name_plural = 'товары в заказах'
 
     def __str__(self):
-        return f'{self.product.name} х {self.quantity} в заказе {self.order.id}'
+        return f'{self.product.name} х {self.quantity} в заказе {self.order.id} по цене  {self.price}'
 
 
 class OrderQuerySet(models.QuerySet):
