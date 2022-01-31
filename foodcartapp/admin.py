@@ -1,8 +1,10 @@
 
 from django.contrib import admin
+from django.http import HttpResponseRedirect
 from django.shortcuts import reverse
 from django.templatetags.static import static
 from django.utils.html import format_html
+from django.utils.http import url_has_allowed_host_and_scheme
 
 from .models import Product
 from .models import Restaurant
@@ -115,6 +117,13 @@ class OrderAdmin(admin.ModelAdmin):
     inlines = [
         OrderItemInline,
     ]
+
+    def response_change(self, request, obj):
+        if 'next' in request.GET:
+            next_url = request.GET['next']
+            if url_has_allowed_host_and_scheme(next_url, None):
+                return HttpResponseRedirect(next_url)
+        return super().response_change(request, obj)
 
     def order_cost(self, obj):
         return f"{obj.total_cost} руб."
