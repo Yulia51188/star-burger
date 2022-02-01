@@ -106,6 +106,7 @@ class OrderItemsSerializer(ModelSerializer):
 class OrderSerializer(ModelSerializer):
     products = OrderItemsSerializer(many=True, allow_empty=False)
     total_cost = serializers.DecimalField(max_digits=8, decimal_places=2)
+    status = serializers.CharField(source='get_status_display')
 
     class Meta:
         model = Order
@@ -117,6 +118,7 @@ class OrderSerializer(ModelSerializer):
             'address',
             'products',
             'total_cost',
+            'status'
         ]
         read_only_fields = ('id', 'total_cost')
 
