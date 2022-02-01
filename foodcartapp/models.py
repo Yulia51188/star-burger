@@ -178,7 +178,6 @@ class Order(models.Model):
         verbose_name='Время создания заказа',
         db_index=True
     )
-
     status = models.CharField(
         'Статус заказа',
         max_length=14,
@@ -186,6 +185,8 @@ class Order(models.Model):
         default=OrderStatus.NOT_PROCESSED,
         db_index=True
     )
+
+    comment = models.TextField('Комментарий к заказу', blank=True, default='')
 
     objects = OrderQuerySet.as_manager()
 
