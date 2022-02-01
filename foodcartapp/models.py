@@ -172,7 +172,7 @@ class Order(models.Model):
     firstname = models.CharField('Имя', max_length=100)
     lastname = models.CharField('Фамилия', max_length=100)
     address = models.CharField('Адрес', max_length=200)
-    phonenumber = PhoneNumberField('Номер телефона')
+    phonenumber = PhoneNumberField('Номер телефона', db_index=True)
     created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Время создания заказа',
@@ -184,6 +184,7 @@ class Order(models.Model):
         max_length=14,
         choices=OrderStatus.choices,
         default=OrderStatus.NOT_PROCESSED,
+        db_index=True
     )
 
     objects = OrderQuerySet.as_manager()
