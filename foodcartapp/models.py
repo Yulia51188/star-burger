@@ -175,7 +175,7 @@ class Order(models.Model):
     phonenumber = PhoneNumberField('Номер телефона', db_index=True)
     status = models.CharField(
         'Статус заказа',
-        max_length=14,
+        max_length=20,
         choices=OrderStatus.choices,
         default=OrderStatus.NOT_PROCESSED,
         db_index=True
