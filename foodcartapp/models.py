@@ -173,17 +173,29 @@ class Order(models.Model):
     lastname = models.CharField('Фамилия', max_length=100)
     address = models.CharField('Адрес', max_length=200)
     phonenumber = PhoneNumberField('Номер телефона', db_index=True)
-    created_at = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name='Время создания заказа',
-        db_index=True
-    )
     status = models.CharField(
         'Статус заказа',
         max_length=14,
         choices=OrderStatus.choices,
         default=OrderStatus.NOT_PROCESSED,
         db_index=True
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Время создания заказа',
+        db_index=True
+    )
+    called_at = models.DateTimeField(
+        verbose_name='Звонок менеджера',
+        db_index=True,
+        blank=True,
+        null=True,
+    )
+    delivered_at = models.DateTimeField(
+        verbose_name='Доставлено',
+        db_index=True,
+        blank=True,
+        null=True,
     )
 
     comment = models.TextField('Комментарий к заказу', blank=True, default='')
