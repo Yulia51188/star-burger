@@ -16,6 +16,7 @@
       <th>ID заказа</th>
       <th>Статус заказа</th>
       <th>Стоимость заказа</th>
+      <th>Способ оплаты</th>
       <th>Клиент</th>
       <th>Телефон</th>
       <th>Адрес доставки</th>
@@ -27,6 +28,13 @@
         <td>{{order.id}}</td>
         <td>{{order.status}}</td>
         <td>{{order.total_cost}} руб.</td>
+        <td>
+          {% if order.payment_method %}
+            {{order.payment_method}} руб.
+          {% else %}
+            Не указан
+          {% endif %}
+        </td>
         <td>{{order.firstname}} {{order.lastname}}</td>
         <td>{{order.phonenumber}}</td>
         <td>{{order.address}}</td>

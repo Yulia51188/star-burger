@@ -169,6 +169,10 @@ class Order(models.Model):
         PROCESSED = 'processed', 'Обработан'
         DONE = 'done', 'Завершен'
 
+    class PaymentMethod(models.TextChoices):
+        CASH = 'cash', 'Наличными при получении'
+        CARD_ONLINE = 'card_online', 'Банковской картой на сайте'
+
     firstname = models.CharField('Имя', max_length=100)
     lastname = models.CharField('Фамилия', max_length=100)
     address = models.CharField('Адрес', max_length=200)
@@ -197,7 +201,13 @@ class Order(models.Model):
         blank=True,
         null=True,
     )
-
+    payment_method = models.CharField(
+        'Способ оплаты',
+        max_length=50,
+        choices=PaymentMethod.choices,
+        blank=True,
+        db_index=True,
+    )
     comment = models.TextField('Комментарий к заказу', blank=True, default='')
 
     objects = OrderQuerySet.as_manager()
