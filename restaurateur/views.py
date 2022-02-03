@@ -129,9 +129,10 @@ class OrderSerializer(ModelSerializer):
 def view_orders(request):
     orders = (
         Order.objects
-        .filter(status=Order.OrderStatus.NOT_PROCESSED)
+        .exclude(status=Order.OrderStatus.DONE)
         .prefetch_related('products')
         .calculate_total_cost()
+        .order_by('id')
     )
 
     orders_serializer = OrderSerializer(orders, many=True)
