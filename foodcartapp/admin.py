@@ -137,6 +137,7 @@ class OrderAdmin(admin.ModelAdmin):
         order_items = formset.save(commit=False)
         for obj in formset.deleted_objects:
             obj.delete()
+
         for order_item in order_items:
             if not order_item.price:
                 product = Product.objects.get(id=order_item.product.id)
@@ -147,4 +148,3 @@ class OrderAdmin(admin.ModelAdmin):
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
     pass
-
