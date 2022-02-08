@@ -112,7 +112,7 @@ class OrderItemInline(admin.TabularInline):
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     list_display = ('id', 'order_cost', 'firstname', 'lastname', 'status',
-                    'called_at', 'delivered_at')
+                    'called_at', 'delivered_at', 'payment_method')
     readonly_fields = ('created_at',)
     list_filter = ('status', 'called_at', 'delivered_at')
     inlines = [
