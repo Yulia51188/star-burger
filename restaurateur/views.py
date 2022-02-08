@@ -1,10 +1,12 @@
 from collections import defaultdict
+from operator import itemgetter
 
 from django import forms
 from django.shortcuts import redirect, render
 from django.views import View
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import user_passes_test
+from django.conf import settings
 
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
@@ -13,6 +15,8 @@ from django.contrib.auth import views as auth_views
 from foodcartapp.models import Product, Restaurant, Order, OrderItem
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
+
+from restaurateur.geocoder import fetch_coordinates, calculate_distance
 
 
 class Login(forms.Form):
@@ -106,9 +110,18 @@ class OrderItemsSerializer(ModelSerializer):
 
 
 class RestaurantSerializer(ModelSerializer):
+    coordinates = serializers.SerializerMethodField()
+
     class Meta:
         model = Restaurant
-        fields = ['name', 'contact_phone', 'address']
+        fields = ['name', 'contact_phone', 'address', 'coordinates']
+
+    def get_coordinates(self, obj):
+        return fetch_coordinates(settings.GEOCODER_TOKEN, obj.address)
+
+
+def get_distance(obj):
+    return obj.get('distance', float('inf'))
 
 
 class OrderSerializer(ModelSerializer):
@@ -146,7 +159,24 @@ class OrderSerializer(ModelSerializer):
             for restaurant, count in restaurants.items()
             if count == product_amount
         ]
-        return available_restaurants
+        delivery_coordinates = fetch_coordinates(
+            settings.GEOCODER_TOKEN,
+            obj.address
+        )
+        available_restaurants_with_distance = [
+            {
+                **restaurant,
+                'distance': calculate_distance(
+                    restaurant['coordinates'],
+                    delivery_coordinates,
+                )
+            }
+            for restaurant in available_restaurants
+        ]
+        return sorted(
+            available_restaurants_with_distance,
+            key=lambda x: ('distance')
+        )
 
 
 @user_passes_test(is_manager, login_url='restaurateur:login')
