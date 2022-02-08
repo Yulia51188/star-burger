@@ -111,28 +111,12 @@ class RestaurantSerializer(ModelSerializer):
         fields = ['name', 'contact_phone', 'address']
 
 
-class RestaurantField(serializers.Field):
-    def to_representation(self, value):
-        product_amount = value.products.count()
-        restaurants = defaultdict(int)
-        for order_item in value.products.all():
-            for menu_item in order_item.product.menu_items.all():
-                if menu_item.availability:
-                    restaurants[menu_item.restaurant] += 1
-        available_restaurants = [
-            RestaurantSerializer(restaurant).data
-            for restaurant, count in restaurants.items()
-            if count == product_amount
-        ]
-        return available_restaurants
-
-
 class OrderSerializer(ModelSerializer):
     products = OrderItemsSerializer(many=True, allow_empty=False)
     total_cost = serializers.DecimalField(max_digits=8, decimal_places=2)
     status = serializers.CharField(source='get_status_display')
     payment_type = serializers.CharField(source='get_payment_method_display')
-    available_restaurants = RestaurantField(source='*')
+    available_restaurants = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
@@ -149,6 +133,20 @@ class OrderSerializer(ModelSerializer):
             'available_restaurants'
         ]
         read_only_fields = ('id', 'total_cost')
+
+    def get_available_restaurants(self, obj):
+        product_amount = obj.products.count()
+        restaurants = defaultdict(int)
+        for order_item in obj.products.all():
+            for menu_item in order_item.product.menu_items.all():
+                if menu_item.availability:
+                    restaurants[menu_item.restaurant] += 1
+        available_restaurants = [
+            RestaurantSerializer(restaurant).data
+            for restaurant, count in restaurants.items()
+            if count == product_amount
+        ]
+        return available_restaurants
 
 
 @user_passes_test(is_manager, login_url='restaurateur:login')
