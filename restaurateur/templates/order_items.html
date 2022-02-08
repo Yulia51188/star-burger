@@ -20,7 +20,8 @@
       <th>Клиент</th>
       <th>Телефон</th>
       <th>Адрес доставки</th>
-      <th>Ссылка на страницу заказа</th>
+      <th>Рестораны</th>
+      <th>Страница заказа</th>
     </tr>
 
     {% for order in orders %}
@@ -38,6 +39,20 @@
         <td>{{order.firstname}} {{order.lastname}}</td>
         <td>{{order.phonenumber}}</td>
         <td>{{order.address}}</td>
+        <td>
+          <details>
+            <summary style="display: revert;">Варианты</summary>
+              {% if order.available_restaurants %}
+                {% for restaurant in order.available_restaurants %}
+                  <p><strong>{{restaurant.name}}</strong></p>
+                  <p>{{restaurant.contact_phone}}</p>
+                  <p>{{restaurant.address}}</p>
+                {% endfor %}
+              {% else %}
+                <p>Не удалось найти ресторан, который может приготовить весь заказ</p>
+              {% endif %}
+          </details>
+        </td>
         <td><a href="{% url 'admin:foodcartapp_order_change' order.id %}?next={{request.get_full_path|urlencode}}">Редактировать</a></td>
       </tr>
     {% endfor %}

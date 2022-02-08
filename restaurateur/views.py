@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from django import forms
 from django.shortcuts import redirect, render
 from django.views import View
@@ -103,11 +105,34 @@ class OrderItemsSerializer(ModelSerializer):
         fields = ['id', 'product', 'quantity', 'price']
 
 
+class RestaurantSerializer(ModelSerializer):
+    class Meta:
+        model = Restaurant
+        fields = ['name', 'contact_phone', 'address']
+
+
+class RestaurantField(serializers.Field):
+    def to_representation(self, value):
+        product_amount = value.products.count()
+        restaurants = defaultdict(int)
+        for order_item in value.products.all():
+            for menu_item in order_item.product.menu_items.all():
+                if menu_item.availability:
+                    restaurants[menu_item.restaurant] += 1
+        available_restaurants = [
+            RestaurantSerializer(restaurant).data
+            for restaurant, count in restaurants.items()
+            if count == product_amount
+        ]
+        return available_restaurants
+
+
 class OrderSerializer(ModelSerializer):
     products = OrderItemsSerializer(many=True, allow_empty=False)
     total_cost = serializers.DecimalField(max_digits=8, decimal_places=2)
     status = serializers.CharField(source='get_status_display')
     payment_type = serializers.CharField(source='get_payment_method_display')
+    available_restaurants = RestaurantField(source='*')
 
     class Meta:
         model = Order
@@ -120,7 +145,8 @@ class OrderSerializer(ModelSerializer):
             'products',
             'total_cost',
             'status',
-            'payment_type'
+            'payment_type',
+            'available_restaurants'
         ]
         read_only_fields = ('id', 'total_cost')
 
@@ -131,11 +157,13 @@ def view_orders(request):
         Order.objects
         .exclude(status=Order.OrderStatus.DONE)
         .prefetch_related('products')
+        .prefetch_related('products__product__menu_items__restaurant')
         .calculate_total_cost()
         .order_by('id')
     )
 
     orders_serializer = OrderSerializer(orders, many=True)
+
     return render(request, template_name='order_items.html', context={
         'orders': orders_serializer.data
     })

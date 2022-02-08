@@ -210,6 +210,16 @@ class Order(models.Model):
     )
     comment = models.TextField('Комментарий к заказу', blank=True, default='')
 
+    restaurant = models.ForeignKey(
+        Restaurant,
+        verbose_name='Ресторан, который готовит заказ',
+        related_name='orders',
+        db_index=True,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+    )
+
     objects = OrderQuerySet.as_manager()
 
     class Meta:
