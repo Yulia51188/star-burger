@@ -1,5 +1,4 @@
 from collections import defaultdict
-from operator import itemgetter
 
 from django import forms
 from django.shortcuts import redirect, render
