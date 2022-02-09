@@ -15,7 +15,7 @@ from foodcartapp.models import Product, Restaurant, Order, OrderItem
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
 
-from restaurateur.geocoder import fetch_coordinates, calculate_distance
+from geocoder.geocoder_functions import fetch_coordinates, calculate_distance
 
 
 class Login(forms.Form):
