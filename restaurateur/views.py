@@ -1,3 +1,5 @@
+from operator import itemgetter
+
 from django import forms
 from django.conf import settings
 from django.contrib.auth import authenticate, login
@@ -116,7 +118,7 @@ class RestaurantSerializer(ModelSerializer):
 
 
 def get_distance(obj):
-    return obj.get('distance', float('inf'))
+    return obj.get('distance') or float('inf')
 
 
 class OrderSerializer(ModelSerializer):
@@ -143,14 +145,11 @@ class OrderSerializer(ModelSerializer):
         read_only_fields = ('id', 'total_cost')
 
     def get_available_restaurants(self, obj):
-        available_restaurants_with_distance = [
+        restaurants = [
             RestaurantSerializer(restaurant).data
             for restaurant in obj.available_restaurants
         ]
-        return sorted(
-            available_restaurants_with_distance,
-            key=lambda x: ('distance')
-        )
+        return restaurants
 
 
 def get_coordinates(orders):
@@ -169,10 +168,17 @@ def join_distances(orders):
     coordinates = get_coordinates(orders)
     for order in orders:
         for restaurant in order['available_restaurants']:
-            restaurant.distance = calculate_distance(
+            restaurant['distance'] = calculate_distance(
                 coordinates.get(order['address']),
                 coordinates.get(restaurant['address']),
             )
+            print(type(restaurant), restaurant)
+
+        sorted_restaurants = sorted(
+            order['available_restaurants'],
+            key=get_distance
+        )
+        order['available_restaurants'] = sorted_restaurants
     return orders
 
 
@@ -191,5 +197,5 @@ def view_orders(request):
     orders_with_distances = join_distances(serialized_orders.data)
 
     return render(request, template_name='order_items.html', context={
-        'orders': orders_with_distances
+        'orders': sorted(orders_with_distances, key=itemgetter('id'))
     })
