@@ -1,9 +1,9 @@
 from collections import defaultdict
 
-from django.db import models
 from django.core.validators import MinValueValidator
-from phonenumber_field.modelfields import PhoneNumberField
+from django.db import models
 from django.db.models import F, Sum
+from phonenumber_field.modelfields import PhoneNumberField
 
 
 class Restaurant(models.Model):

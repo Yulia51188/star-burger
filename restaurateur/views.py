@@ -1,18 +1,15 @@
 from django import forms
-from django.shortcuts import redirect, render
-from django.views import View
-from django.urls import reverse_lazy
-from django.contrib.auth.decorators import user_passes_test
 from django.conf import settings
-
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
-
-
-from foodcartapp.models import Product, Restaurant, Order, OrderItem
-from rest_framework.serializers import ModelSerializer
+from django.contrib.auth.decorators import user_passes_test
+from django.shortcuts import redirect, render
+from django.urls import reverse_lazy
+from django.views import View
 from rest_framework import serializers
+from rest_framework.serializers import ModelSerializer
 
+from foodcartapp.models import Order, OrderItem, Product, Restaurant
 from geocoder.geocoder_functions import (calculate_distance,
                                          fetch_coordinates_by_addresses)
 

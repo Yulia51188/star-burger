@@ -1,10 +1,11 @@
-import os
 import json
+import os
 
-from django.core.management.base import BaseCommand
 from django.core.files.base import ContentFile
+from django.core.management.base import BaseCommand
 
-from foodcartapp.models import Product, Restaurant, ProductCategory, RestaurantMenuItem
+from foodcartapp.models import (Product, ProductCategory, Restaurant,
+                                RestaurantMenuItem)
 
 
 def upload_photo(photo_path, product):

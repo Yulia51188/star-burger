@@ -1,7 +1,6 @@
 import requests
-from geopy import distance
-
 from django.conf import settings
+from geopy import distance
 
 from geocoder.models import Place
 
