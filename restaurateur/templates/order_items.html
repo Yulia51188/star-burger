@@ -43,8 +43,8 @@
           <details>
             <summary style="display: revert;">Варианты</summary>
               {% if order.available_restaurants %}
-                <p><strong>{{restaurant.name}}</strong></p>
                 {% for restaurant in order.available_restaurants %}
+                  <p><strong>{{restaurant.name}}</strong></p>
                   {% if restaurant.distance %}
                     <p><em>Расстояние {{restaurant.distance|floatformat:"-2"}} км</em></p>
                   {% else %}
