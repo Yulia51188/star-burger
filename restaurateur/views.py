@@ -1,5 +1,3 @@
-from collections import defaultdict
-
 from django import forms
 from django.shortcuts import redirect, render
 from django.views import View
@@ -15,7 +13,8 @@ from foodcartapp.models import Product, Restaurant, Order, OrderItem
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
 
-from geocoder.geocoder_functions import fetch_coordinates, calculate_distance
+from geocoder.geocoder_functions import (calculate_distance,
+                                         fetch_coordinates_by_addresses)
 
 
 class Login(forms.Form):
@@ -109,14 +108,14 @@ class OrderItemsSerializer(ModelSerializer):
 
 
 class RestaurantSerializer(ModelSerializer):
-    coordinates = serializers.SerializerMethodField()
 
     class Meta:
         model = Restaurant
-        fields = ['name', 'contact_phone', 'address', 'coordinates']
-
-    def get_coordinates(self, obj):
-        return fetch_coordinates(settings.GEOCODER_TOKEN, obj.address)
+        fields = [
+            'name',
+            'contact_phone',
+            'address',
+        ]
 
 
 def get_distance(obj):
@@ -147,35 +146,37 @@ class OrderSerializer(ModelSerializer):
         read_only_fields = ('id', 'total_cost')
 
     def get_available_restaurants(self, obj):
-        product_amount = obj.products.count()
-        restaurants = defaultdict(int)
-        for order_item in obj.products.all():
-            for menu_item in order_item.product.menu_items.all():
-                if menu_item.availability:
-                    restaurants[menu_item.restaurant] += 1
-        available_restaurants = [
-            RestaurantSerializer(restaurant).data
-            for restaurant, count in restaurants.items()
-            if count == product_amount
-        ]
-        delivery_coordinates = fetch_coordinates(
-            settings.GEOCODER_TOKEN,
-            obj.address
-        )
         available_restaurants_with_distance = [
-            {
-                **restaurant,
-                'distance': calculate_distance(
-                    restaurant['coordinates'],
-                    delivery_coordinates,
-                )
-            }
-            for restaurant in available_restaurants
+            RestaurantSerializer(restaurant).data
+            for restaurant in obj.available_restaurants
         ]
         return sorted(
             available_restaurants_with_distance,
             key=lambda x: ('distance')
         )
+
+
+def get_coordinates(orders):
+    orders_address = [order['address'] for order in orders]
+    restaurants_address = [
+        restaurant.address for restaurant in Restaurant.objects.all()
+    ]
+    coordinates = fetch_coordinates_by_addresses(
+        [*restaurants_address, *orders_address],
+        settings.GEOCODER_TOKEN
+    )
+    return coordinates
+
+
+def join_distances(orders):
+    coordinates = get_coordinates(orders)
+    for order in orders:
+        for restaurant in order['available_restaurants']:
+            restaurant.distance = calculate_distance(
+                coordinates.get(order['address']),
+                coordinates.get(restaurant['address']),
+            )
+    return orders
 
 
 @user_passes_test(is_manager, login_url='restaurateur:login')
@@ -186,11 +187,12 @@ def view_orders(request):
         .prefetch_related('products')
         .prefetch_related('products__product__menu_items__restaurant')
         .calculate_total_cost()
-        .order_by('id')
+        .join_restaurants()
     )
 
-    orders_serializer = OrderSerializer(orders, many=True)
+    serialized_orders = OrderSerializer(orders, many=True)
+    orders_with_distances = join_distances(serialized_orders.data)
 
     return render(request, template_name='order_items.html', context={
-        'orders': orders_serializer.data
+        'orders': orders_with_distances
     })

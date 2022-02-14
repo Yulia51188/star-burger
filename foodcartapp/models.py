@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from django.db import models
 from django.core.validators import MinValueValidator
 from phonenumber_field.modelfields import PhoneNumberField
@@ -160,6 +162,22 @@ class OrderQuerySet(models.QuerySet):
     def calculate_total_cost(self):
         return self.annotate(
             total_cost=Sum(F('products__price') * F('products__quantity')))
+
+    def join_restaurants(self):
+        """WARNING: evaluate queryset."""
+        for order in self:
+            product_amount = order.products.count()
+            restaurants = defaultdict(int)
+            for order_item in order.products.all():
+                for menu_item in order_item.product.menu_items.all():
+                    if menu_item.availability:
+                        restaurants[menu_item.restaurant] += 1
+            order.available_restaurants = [
+                restaurant
+                for restaurant, count in restaurants.items()
+                if count == product_amount
+            ]
+        return self
 
 
 class Order(models.Model):
