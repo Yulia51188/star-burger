@@ -18,8 +18,6 @@ def fetch_coordinates(apikey, address):
     response.raise_for_status()
     found_places = response.json()['response']['GeoObjectCollection']['featureMember']
 
-    print(f'FETCH COORDINATES WITH API: {address}')
-
     if not found_places:
         return None
 

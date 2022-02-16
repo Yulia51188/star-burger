@@ -172,7 +172,6 @@ def join_distances(orders):
                 coordinates.get(order['address']),
                 coordinates.get(restaurant['address']),
             )
-            print(type(restaurant), restaurant)
 
         sorted_restaurants = sorted(
             order['available_restaurants'],
