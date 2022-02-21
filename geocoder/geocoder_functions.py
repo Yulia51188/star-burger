@@ -42,10 +42,11 @@ def define_coordinates(address):
     except Place.DoesNotExist:
         coordinates = fetch_coordinates(settings.GEOCODER_TOKEN, address)
         if coordinates:
+            lon, lat = coordinates
             Place.objects.create(
                 address=address,
-                longitude=coordinates[0],
-                latitude=coordinates[1],
+                longitude=lon,
+                latitude=lat,
             )
         return coordinates
 
