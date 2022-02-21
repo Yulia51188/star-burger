@@ -5,8 +5,6 @@ from geocoder.models import Place
 
 
 def fetch_coordinates(apikey, address):
-    print('fetch_coordinates'.upper(), address)
-
     base_url = "https://geocode-maps.yandex.ru/1.x"
     response = requests.get(base_url, params={
         "geocode": address,
