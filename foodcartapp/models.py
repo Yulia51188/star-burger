@@ -141,7 +141,11 @@ class OrderItem(models.Model):
         on_delete=models.CASCADE,
         related_name='order_items'
     )
-    quantity = models.PositiveIntegerField('Количество')
+    quantity = models.PositiveIntegerField(
+        'Количество',
+        validators=[MinValueValidator(1)],
+    )
+
     price = models.DecimalField(
         'цена',
         max_digits=8,
