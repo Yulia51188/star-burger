@@ -170,9 +170,10 @@ class OrderQuerySet(models.QuerySet):
     def join_restaurants(self):
         """WARNING: evaluate queryset."""
         for order in self:
-            product_amount = order.order_items.count()
+            order_items = order.order_items.all()
+            product_amount = len(order_items)
             restaurants = defaultdict(int)
-            for order_item in order.order_items.all():
+            for order_item in order_items:
                 for menu_item in order_item.product.menu_items.all():
                     if menu_item.availability:
                         restaurants[menu_item.restaurant] += 1
