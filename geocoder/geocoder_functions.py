@@ -53,6 +53,7 @@ def fetch_coordinates_by_addresses(addresses, apikey):
 
         known_coordinates[address] = fetch_coordinates(apikey, address)
         if not known_coordinates[address]:
+            new_places.append(Place(address=address))
             continue
 
         lon, lat = known_coordinates[address]
