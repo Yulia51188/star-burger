@@ -225,7 +225,7 @@ class Order(models.Model):
         choices=PaymentMethod.choices,
         db_index=True,
     )
-    comment = models.TextField('Комментарий к заказу', blank=True, default='')
+    comment = models.TextField('Комментарий к заказу', blank=True)
 
     restaurant = models.ForeignKey(
         Restaurant,
