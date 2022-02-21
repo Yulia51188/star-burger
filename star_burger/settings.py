@@ -124,4 +124,4 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "bundles"),
 ]
 
-GEOCODER_TOKEN = env('GEOCODER_TOKEN', '')
+GEOCODER_TOKEN = env('GEOCODER_TOKEN')
