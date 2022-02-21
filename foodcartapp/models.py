@@ -223,7 +223,6 @@ class Order(models.Model):
         'Способ оплаты',
         max_length=50,
         choices=PaymentMethod.choices,
-        blank=True,
         db_index=True,
     )
     comment = models.TextField('Комментарий к заказу', blank=True, default='')
