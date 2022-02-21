@@ -131,7 +131,7 @@ class OrderItem(models.Model):
     order = models.ForeignKey(
         'Order',
         verbose_name='Заказ',
-        related_name='products',
+        related_name='order_items',
         on_delete=models.CASCADE,
         db_index=True,
     )
@@ -161,14 +161,14 @@ class OrderItem(models.Model):
 class OrderQuerySet(models.QuerySet):
     def calculate_total_cost(self):
         return self.annotate(
-            total_cost=Sum(F('products__price') * F('products__quantity')))
+            total_cost=Sum(F('order_items__price') * F('order_items__quantity')))
 
     def join_restaurants(self):
         """WARNING: evaluate queryset."""
         for order in self:
-            product_amount = order.products.count()
+            product_amount = order.order_items.count()
             restaurants = defaultdict(int)
-            for order_item in order.products.all():
+            for order_item in order.order_items.all():
                 for menu_item in order_item.product.menu_items.all():
                     if menu_item.availability:
                         restaurants[menu_item.restaurant] += 1

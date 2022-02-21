@@ -8,21 +8,6 @@ from rest_framework.serializers import ModelSerializer
 from .models import Order, OrderItem, Product
 
 
-class OrderItemsSerializer(ModelSerializer):
-    class Meta:
-        model = OrderItem
-        fields = ['product', 'quantity']
-
-
-class OrderSerializer(ModelSerializer):
-    products = OrderItemsSerializer(many=True, allow_empty=False)
-
-    class Meta:
-        model = Order
-        fields = ['id', 'firstname', 'lastname', 'phonenumber', 'address', 'products']
-        read_only_fields = ('id',)
-
-
 def banners_list_api(request):
     # FIXME move data to db?
     return JsonResponse([
@@ -75,12 +60,33 @@ def product_list_api(request):
     })
 
 
+class OrderItemsSerializer(ModelSerializer):
+    class Meta:
+        model = OrderItem
+        fields = ['product', 'quantity']
+
+
+class OrderSerializer(ModelSerializer):
+    products = OrderItemsSerializer(source='order_items', many=True, allow_empty=False)
+
+    class Meta:
+        model = Order
+        fields = [
+            'id',
+            'firstname',
+            'lastname',
+            'phonenumber',
+            'address',
+            'products'
+        ]
+        read_only_fields = ('id', )
+
+
 @transaction.atomic
 @api_view(['POST'])
 def register_order(request):
     serializer = OrderSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
-
     order = Order.objects.create(
         firstname=serializer.validated_data['firstname'],
         lastname=serializer.validated_data['lastname'],
@@ -88,15 +94,15 @@ def register_order(request):
         phonenumber=serializer.validated_data['phonenumber'],
     )
 
-    products = serializer.validated_data['products']
+    order_items = serializer.validated_data['order_items']
     order_items = [
         OrderItem(
             order=order,
-            product=product['product'],
-            quantity=product['quantity'],
-            price=product['product'].price,
+            product=order_item['product'],
+            quantity=order_item['quantity'],
+            price=order_item['product'].price,
         )
-        for product in products
+        for order_item in order_items
     ]
     OrderItem.objects.bulk_create(order_items)
 

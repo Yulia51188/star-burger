@@ -122,7 +122,7 @@ def get_distance(obj):
 
 
 class OrderSerializer(ModelSerializer):
-    products = OrderItemsSerializer(many=True, allow_empty=False)
+    order_items = OrderItemsSerializer(many=True, allow_empty=False)
     total_cost = serializers.DecimalField(max_digits=8, decimal_places=2)
     status = serializers.CharField(source='get_status_display')
     payment_type = serializers.CharField(source='get_payment_method_display')
@@ -136,7 +136,7 @@ class OrderSerializer(ModelSerializer):
             'lastname',
             'phonenumber',
             'address',
-            'products',
+            'order_items',
             'total_cost',
             'status',
             'payment_type',
@@ -186,8 +186,8 @@ def view_orders(request):
     orders = (
         Order.objects
         .exclude(status=Order.OrderStatus.DONE)
-        .prefetch_related('products')
-        .prefetch_related('products__product__menu_items__restaurant')
+        .prefetch_related('order_items')
+        .prefetch_related('order_items__product__menu_items__restaurant')
         .calculate_total_cost()
         .join_restaurants()
     )
