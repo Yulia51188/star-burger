@@ -1,6 +1,7 @@
 from operator import itemgetter
 
 from django import forms
+from django.db.models import Prefetch
 from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
@@ -11,7 +12,8 @@ from django.views import View
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
-from foodcartapp.models import Order, OrderItem, Product, Restaurant
+from foodcartapp.models import (Order, OrderItem, Product, Restaurant,
+                                RestaurantMenuItem)
 from geocoder.geocoder_functions import (calculate_distance,
                                          fetch_coordinates_by_addresses)
 
@@ -183,11 +185,17 @@ def join_distances(orders):
 
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
+    menu_item_qs = (
+        RestaurantMenuItem.objects
+        .filter(availability=True)
+        .select_related('restaurant')
+    )
     orders = (
         Order.objects
         .exclude(status=Order.OrderStatus.DONE)
-        .prefetch_related('order_items')
-        .prefetch_related('order_items__product__menu_items__restaurant')
+        .prefetch_related(
+            Prefetch('order_items__product__menu_items', queryset=menu_item_qs)
+        )
         .calculate_total_cost()
         .join_restaurants()
     )

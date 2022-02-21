@@ -175,8 +175,7 @@ class OrderQuerySet(models.QuerySet):
             restaurants = defaultdict(int)
             for order_item in order_items:
                 for menu_item in order_item.product.menu_items.all():
-                    if menu_item.availability:
-                        restaurants[menu_item.restaurant] += 1
+                    restaurants[menu_item.restaurant] += 1
             order.available_restaurants = [
                 restaurant
                 for restaurant, count in restaurants.items()
