@@ -2,6 +2,7 @@ bundles/**
 node_modules/
 media/
 test_data/
+staticfiles/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
