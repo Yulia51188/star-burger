@@ -3,6 +3,7 @@ node_modules/
 media/
 test_data/
 staticfiles/
+db.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

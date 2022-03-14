@@ -145,6 +145,7 @@ parcel build bundles-src/index.js --dist-dir bundles --public-url="./"
 - `ALLOWED_HOSTS` — [см. документацию Django](https://docs.djangoproject.com/en/3.1/ref/settings/#allowed-hosts)
 - `GEOCODER_TOKEN` - токен для [геокодера Яндекс](https://developer.tech.yandex.ru/services/), чтобы определять расстояние от ресторана до адреса. Обязательная переменная окружения.
 - `ROLLBAR` - токен для сервиса [Rollbar](https://rollbar.com/), чтобы получать сообщения об ошибках, исключая HTTP404. Обязательная переменная окружения.
+- `DATABASE_URL` - конфигурация БД, указывается в виде URL, см. [примеры](https://github.com/jacobian/dj-database-url#id7). Если значение не указано, то используется движок `SQLite`, имя файла `db.sqlite`. Для использования `PostgreSQL` в `requirements.txt` добавлена библиотека [psycorg2](https://pypi.org/project/psycopg2/).
 
 ## Цели проекта
 
