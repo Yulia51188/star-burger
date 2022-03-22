@@ -4,6 +4,7 @@ media/
 test_data/
 staticfiles/
 db.json
+test_bash_script
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
