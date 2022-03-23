@@ -97,7 +97,7 @@ npm install --dev
 Установите [Parcel](https://parceljs.org/). Это упаковщик веб-приложений. Он похож на [Webpack](https://webpack.js.org/), но совсем не требует настроек:
 
 ```sh
-npm install -g parcel@latest  # понадобятся права администратора `sudo`
+npm install -g parcel@2.0.0-beta.2  # понадобятся права администратора `sudo`
 ```
 
 Вам нужна вторая версия Parcel. Проверьте, что `parcel` установлен и его версию в командной строке:
@@ -146,6 +146,16 @@ parcel build bundles-src/index.js --dist-dir bundles --public-url="./"
 - `GEOCODER_TOKEN` - токен для [геокодера Яндекс](https://developer.tech.yandex.ru/services/), чтобы определять расстояние от ресторана до адреса. Обязательная переменная окружения.
 - `ROLLBAR` - токен для сервиса [Rollbar](https://rollbar.com/), чтобы получать сообщения об ошибках, исключая HTTP404. Обязательная переменная окружения.
 - `DATABASE_URL` - конфигурация БД, указывается в виде URL, см. [примеры](https://github.com/jacobian/dj-database-url#id7). Если значение не указано, то используется движок `SQLite`, имя файла `db.sqlite`. Для использования `PostgreSQL` в `requirements.txt` добавлена библиотека [psycorg2](https://pypi.org/project/psycopg2/).
+
+
+## Информация для проверяющего
+
+- домен [yulyas-burgers.tk](https://yulyas-burgers.tk/)
+- IP [77.223.96.144](https://77.223.96.144/)
+- имя пользователя - `root`
+- порт ssh - `80`
+- скрипт для деплоя `/opt/star-burger/starburger_deploy.sh`
+
 
 ## Цели проекта
 
