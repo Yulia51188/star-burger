@@ -151,7 +151,7 @@ Parcel будет следить за файлами в каталоге `bundle
 - домен [yulyas-burgers.tk](https://yulyas-burgers.tk/)
 - IP [77.223.96.144](https://77.223.96.144/)
 - имя пользователя - `root`
-- порт ssh - `80`
+- порт ssh, стандартный - `22`
 - скрипт для деплоя `/opt/star-burger/starburger_deploy.sh`
 
 
