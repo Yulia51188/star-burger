@@ -142,7 +142,8 @@ Parcel будет следить за файлами в каталоге `bundle
 - `SECRET_KEY` — секретный ключ проекта. Он отвечает за шифрование на сайте. Например, им зашифрованы все пароли на вашем сайте. Не стоит использовать значение по-умолчанию, **замените на своё**.
 - `ALLOWED_HOSTS` — [см. документацию Django](https://docs.djangoproject.com/en/3.1/ref/settings/#allowed-hosts)
 - `GEOCODER_TOKEN` - токен для [геокодера Яндекс](https://developer.tech.yandex.ru/services/), чтобы определять расстояние от ресторана до адреса. Обязательная переменная окружения.
-- `ROLLBAR` - токен для сервиса [Rollbar](https://rollbar.com/), чтобы получать сообщения об ошибках, исключая HTTP404. Обязательная переменная окружения.
+- `ROLLBAR_TOKEN` - токен для сервиса [Rollbar](https://rollbar.com/), чтобы получать сообщения об ошибках, исключая HTTP404. Обязательная переменная окружения.
+- `ROLLBAR_ENV_LABEL` - строка, описывающая окружение запущенного проекта, по умолчанию `production`.
 - `DATABASE_URL` - конфигурация БД, указывается в виде URL, см. [примеры](https://github.com/jacobian/dj-database-url#id7). Если значение не указано, то используется движок `SQLite`, имя файла `db.sqlite`. Для использования `PostgreSQL` в `requirements.txt` добавлена библиотека [psycorg2](https://pypi.org/project/psycopg2/).
 
 
@@ -151,7 +152,7 @@ Parcel будет следить за файлами в каталоге `bundle
 - домен [yulyas-burgers.tk](https://yulyas-burgers.tk/)
 - IP [77.223.96.144](https://77.223.96.144/)
 - имя пользователя - `root`
-- порт ssh - `80`
+- порт ssh, стандартный - `22`
 - скрипт для деплоя `/opt/star-burger/starburger_deploy.sh`
 
 
